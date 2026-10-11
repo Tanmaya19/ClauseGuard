@@ -1,0 +1,24 @@
+# ML training and inference dependencies.
+#
+# Kept separate from backend/requirements.txt: these add roughly 2.5 GB, and
+# the backend needs them only once a trained checkpoint exists. Without them
+# the classifier falls back to the keyword baseline and the app still runs.
+#
+# Install into the backend venv when you are ready to serve a trained model:
+#     pip install -r ml/requirements.txt
+#
+# For training, use Colab — a free T4 is enough for ~3 epochs.
+
+torch==2.5.1
+transformers==4.47.1
+datasets==3.2.0
+scikit-learn==1.6.0
+accelerate==1.2.1
+
+# CPU inference export (optional; measure before adopting — see PLAN.md 4.3)
+onnx==1.17.0
+onnxruntime==1.20.1
+
+# The backend package is imported by prepare_cuad.py so that training and
+# serving share one segmenter. Install the backend requirements too:
+#     pip install -r backend/requirements.txt

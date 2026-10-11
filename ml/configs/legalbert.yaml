@@ -1,0 +1,22 @@
+# Comparison run: Legal-BERT, the backbone SRS 2.5 names first.
+#
+# Trained on identical data and splits to distilbert.yaml so the two rows in
+# the results table differ only by backbone. Expect better macro-F1 and
+# roughly 2x the CPU inference latency — which is the trade-off that justifies
+# serving DistilBERT.
+#
+# Lower learning rate and batch size: this is a full-size BERT (12 layers vs
+# DistilBERT's 6), so it needs gentler steps and more memory per example.
+
+model_name: nlpaueb/legal-bert-base-uncased
+output_dir: ml/artifacts/legalbert
+version: legalbert-cuad-v1
+
+max_length: 256
+epochs: 3.0
+batch_size: 8
+learning_rate: 2.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+seed: 20241042
+max_class_weight: 20.0

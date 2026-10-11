@@ -1,0 +1,43 @@
+# CPU training configuration.
+#
+# Identical to distilbert.yaml except for the epoch count, which is reduced
+# from 3 to 2.
+#
+# WHY THIS FILE EXISTS
+# --------------------
+# The machine has an RTX 4050, but no CUDA build of PyTorch could be installed
+# for its Python version within this session: the CUDA index offers wheels up
+# to torch 2.11.0+cu128, while pip had already resolved the newer CPU-only
+# 2.14.1 from PyPI and treated it as more recent, and the explicit pinned
+# re-install stalled on the ~2.5 GB download over an unreliable connection.
+#
+# Measured on this machine, CPU training runs at **4.6 s/step** (batch 16,
+# 256 tokens, 10 threads). The training split is 12,817 clauses, so:
+#
+#   801 steps/epoch x 3 epochs x 4.6 s  =  ~3.1 hours
+#   801 steps/epoch x 2 epochs x 4.6 s  =  ~2.0 hours
+#
+# Two epochs is the compromise. Sequence length is deliberately NOT reduced:
+# truncating from 256 to 192 tokens would have been the cheaper saving, but it
+# cuts into the clause body, and clause type is not always determinable from
+# the opening sentence alone.
+#
+# This produces a genuinely trained checkpoint, just a slightly
+# under-trained one. Expect macro-F1 below what distilbert.yaml would give on
+# a GPU. Report which config produced any number quoted.
+#
+# To train properly once a CUDA build is available:
+#     python ml/scripts/train.py --config ml/configs/distilbert.yaml
+
+model_name: distilbert-base-uncased
+output_dir: ml/artifacts/distilbert
+version: distilbert-cuad-v1-cpu-2ep
+
+max_length: 256
+epochs: 2.0
+batch_size: 16
+learning_rate: 3.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+seed: 20241042
+max_class_weight: 20.0

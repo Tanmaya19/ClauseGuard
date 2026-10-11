@@ -1,0 +1,19 @@
+# Served model (SRS 2.5 permits Legal-BERT or DistilBERT).
+#
+# DistilBERT is served because SRS 2.4 mandates CPU inference and the TBD-3
+# budget is 30 s for 50 clauses. Legal-BERT is trained under legalbert.yaml
+# with identical data and splits so the choice is evidenced by measurement
+# rather than asserted.
+
+model_name: distilbert-base-uncased
+output_dir: ml/artifacts/distilbert
+version: distilbert-cuad-v1
+
+max_length: 256
+epochs: 3.0
+batch_size: 16
+learning_rate: 3.0e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+seed: 20241042
+max_class_weight: 20.0

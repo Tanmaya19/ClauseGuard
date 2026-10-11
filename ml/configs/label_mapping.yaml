@@ -1,0 +1,170 @@
+# CUAD's 41 categories -> ClauseGuard's 20 classes (REQ-3.1, SRS 6).
+#
+# This file is the audit trail SRS 6 requires for label mapping. Every CUAD
+# category appears exactly once: either mapped to a class, or listed under
+# `dropped` with the reason. A category missing from both is a load error, so
+# the mapping cannot silently lose a label.
+#
+# CUAD category names are as they appear in the Atticus Project release.
+
+mapping:
+  parties_definitions:
+    - Parties
+    - Document Name
+
+  term_effective_date:
+    - Agreement Date
+    - Effective Date
+    - Expiration Date
+
+  renewal_auto_renewal:
+    - Renewal Term
+    - Notice Period To Terminate Renewal
+
+  termination_convenience:
+    - Termination For Convenience
+
+  # No CUAD category covers termination for breach or cure periods; this class
+  # is supplied entirely by the Indian domain corpus (TBD-5).
+  termination_cause_cure: []
+
+  payment_terms:
+    - Price Restrictions
+    - Minimum Commitment
+    - Revenue/Profit Sharing
+    - Volume Restriction
+
+  # Indian addition (MSMED Act, GST). Not present in a US dataset.
+  late_payment_interest_gst: []
+
+  indemnity: []
+
+  limitation_of_liability:
+    - Cap On Liability
+    - Uncapped Liability
+    - Liquidated Damages
+
+  warranties:
+    - Warranty Duration
+
+  # CUAD's contracts are mostly public filings with confidentiality redacted
+  # or externalised into separate NDAs, so support here is thin.
+  confidentiality: []
+
+  ip_ownership_licence:
+    - Ip Ownership Assignment
+    - License Grant
+    - Joint Ip Ownership
+    - Non-Transferable License
+    - Irrevocable Or Perpetual License
+    - Unlimited/All-You-Can-Eat-License
+    - Affiliate License-Licensor
+    - Affiliate License-Licensee
+    - Source Code Escrow
+
+  exclusivity_noncompete:
+    - Exclusivity
+    - Non-Compete
+    - No-Solicit Of Customers
+    - No-Solicit Of Employees
+    - Competitive Restriction Exception
+    - Most Favored Nation
+
+  assignment_control:
+    - Anti-Assignment
+    - Change Of Control
+    - Rofr/Rofo/Rofn
+
+  governing_law:
+    - Governing Law
+
+  # Indian addition (Arbitration and Conciliation Act, 1996).
+  dispute_arbitration: []
+
+  force_majeure: []
+
+  audit_compliance:
+    - Audit Rights
+
+  insurance:
+    - Insurance
+
+  notices_misc:
+    - Notice
+
+# Categories deliberately not mapped, with the reason. These become negatives
+# rather than being forced into an ill-fitting class.
+dropped:
+  # The three below were mapped on a first pass and removed after auditing the
+  # conversion, because each was injecting wrong labels:
+  #
+  #  - "Covenant Not To Sue" and "Third Party Beneficiary" were folded into
+  #    audit_compliance on the loose grounds of both being "compliance-ish".
+  #    They are not audit or inspection provisions at all, and the audit found
+  #    a trademark-ownership clause labelled audit_compliance through them.
+  #  - "Post-Termination Services" was folded into notices_misc as
+  #    miscellaneous boilerplate. The audit found a termination-for-patent-
+  #    impact clause labelled notices_misc through it.
+  #
+  # No class in the taxonomy fits these three, so they become negatives. That
+  # is the correct outcome: a forced mapping is worse than no mapping, because
+  # it teaches the model a wrong association rather than nothing.
+  Covenant Not To Sue: "Litigation forbearance; no taxonomy class fits."
+  Third Party Beneficiary: "Who may enforce the contract; no taxonomy class fits."
+  Post-Termination Services: "Transition obligations; no taxonomy class fits."
+
+  # Not an exclusivity or competition restriction. Auditing the conversion
+  # found a conduct/morals clause ("bring the Professional into public hatred,
+  # contempt, scorn or ridicule") labelled exclusivity_noncompete through this
+  # mapping. No class in the taxonomy fits it, so it becomes a negative.
+  Non-Disparagement: "Reputational conduct restriction; no taxonomy class fits."
+  Anti-Assignment- Answer: "Answer-variant duplicate of its parent category."
+  Cap On Liability- Answer: "Answer-variant duplicate."
+  Change Of Control- Answer: "Answer-variant duplicate."
+  Competitive Restriction Exception- Answer: "Answer-variant duplicate."
+  Exclusivity- Answer: "Answer-variant duplicate."
+  Governing Law- Answer: "Answer-variant duplicate."
+  Insurance- Answer: "Answer-variant duplicate."
+  Ip Ownership Assignment- Answer: "Answer-variant duplicate."
+  Joint Ip Ownership- Answer: "Answer-variant duplicate."
+  License Grant- Answer: "Answer-variant duplicate."
+  Minimum Commitment- Answer: "Answer-variant duplicate."
+  Most Favored Nation- Answer: "Answer-variant duplicate."
+  No-Solicit Of Customers- Answer: "Answer-variant duplicate."
+  No-Solicit Of Employees- Answer: "Answer-variant duplicate."
+  Non-Compete- Answer: "Answer-variant duplicate."
+  Non-Disparagement- Answer: "Answer-variant duplicate."
+  Non-Transferable License- Answer: "Answer-variant duplicate."
+  Price Restrictions- Answer: "Answer-variant duplicate."
+  Revenue/Profit Sharing- Answer: "Answer-variant duplicate."
+  Rofr/Rofo/Rofn- Answer: "Answer-variant duplicate."
+  Source Code Escrow- Answer: "Answer-variant duplicate."
+  Termination For Convenience- Answer: "Answer-variant duplicate."
+  Third Party Beneficiary- Answer: "Answer-variant duplicate."
+  Uncapped Liability- Answer: "Answer-variant duplicate."
+  Unlimited/All-You-Can-Eat-License- Answer: "Answer-variant duplicate."
+  Volume Restriction- Answer: "Answer-variant duplicate."
+  Warranty Duration- Answer: "Answer-variant duplicate."
+  Audit Rights- Answer: "Answer-variant duplicate."
+  Affiliate License-Licensee- Answer: "Answer-variant duplicate."
+  Affiliate License-Licensor- Answer: "Answer-variant duplicate."
+  Irrevocable Or Perpetual License- Answer: "Answer-variant duplicate."
+  Liquidated Damages- Answer: "Answer-variant duplicate."
+  Post-Termination Services- Answer: "Answer-variant duplicate."
+  Covenant Not To Sue- Answer: "Answer-variant duplicate."
+  Expiration Date- Answer: "Answer-variant duplicate."
+  Renewal Term- Answer: "Answer-variant duplicate."
+  Agreement Date- Answer: "Answer-variant duplicate."
+  Effective Date- Answer: "Answer-variant duplicate."
+  Parties- Answer: "Answer-variant duplicate."
+  Document Name- Answer: "Answer-variant duplicate."
+
+# Classes with no CUAD support at all. Reported separately in evaluation so
+# their weakness is visible rather than hidden in a macro average.
+thin_in_cuad:
+  - termination_cause_cure
+  - late_payment_interest_gst
+  - indemnity
+  - confidentiality
+  - dispute_arbitration
+  - force_majeure
