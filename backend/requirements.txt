@@ -1,0 +1,45 @@
+# --- Web layer ---------------------------------------------------------
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+email-validator==2.2.0
+
+# --- Persistence -------------------------------------------------------
+SQLAlchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+
+# --- Document parsing (Phase 1) ---------------------------------------
+pymupdf==1.25.1
+python-docx==1.1.2
+
+# --- Segmentation (Phase 2) -------------------------------------------
+pysbd==0.3.4
+
+# --- Risk rubric (Phase 4) --------------------------------------------
+PyYAML==6.0.2
+
+# --- Auth (Phase 5) ----------------------------------------------------
+# bcrypt is pinned under 4.1 because passlib 1.7.4 reads bcrypt.__about__,
+# which was removed in 4.1 and emits a spurious error on every hash call.
+passlib==1.7.4
+bcrypt==4.0.1
+PyJWT==2.10.1
+
+# --- Report export (Phase 7) ------------------------------------------
+# reportlab, not WeasyPrint: WeasyPrint needs GTK/Pango system libraries,
+# which do not install cleanly on Windows, and this project is developed on
+# Windows. reportlab is pure Python and behaves identically on both.
+# See docs/ADRs/0002-reportlab-over-weasyprint.md
+reportlab==4.2.5
+
+# --- Dev / test --------------------------------------------------------
+pytest==8.3.4
+httpx==0.28.1
+ruff==0.8.4
+
+# NOT here on purpose: torch and transformers. They add ~2.5 GB to the image
+# and are needed only once a trained checkpoint exists. The classifier falls
+# back to a keyword baseline without them. See ml/requirements.txt.

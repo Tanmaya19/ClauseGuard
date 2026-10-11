@@ -1,0 +1,28 @@
+[project]
+name = "clauseguard-backend"
+version = "0.1.0"
+description = "ClauseGuard — AI-powered contract risk analyzer for Indian MSMEs"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q --strict-markers"
+markers = [
+    "db: requires a reachable PostgreSQL instance (see tests/conftest.py)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4"]
+# B008 forbids function calls in argument defaults, but `Depends(...)` in a
+# signature default is the documented FastAPI idiom for dependency injection.
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+# Migrations are machine-generated; reformatting them obscures the diff against
+# what `alembic revision --autogenerate` actually produced.
+"app/db/migrations/versions/*.py" = ["E501"]
