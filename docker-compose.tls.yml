@@ -1,0 +1,19 @@
+# TLS overlay. Use alongside the base file:
+#
+#   bash scripts/generate_dev_certs.sh certs
+#   docker compose -f docker-compose.yml -f docker-compose.tls.yml up -d --build
+#
+# Swaps the web service onto the TLS nginx configuration and mounts the
+# certificates read-only. Certificates stay outside the image so the same
+# image can be promoted between environments.
+
+services:
+  web:
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./frontend/nginx.tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+      # ACME webroot, for certificate renewal in a real deployment.
+      - ./certbot-webroot:/var/www/certbot

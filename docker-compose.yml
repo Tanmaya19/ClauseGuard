@@ -1,0 +1,57 @@
+name: clauseguard
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-clauseguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clauseguard}
+      POSTGRES_DB: ${POSTGRES_DB:-clauseguard}
+    ports:
+      # Exposed so pytest and alembic can run from the host too.
+      # Host 5433, not 5432: other projects on this machine commonly hold 5432,
+      # and a port clash there stops the whole stack from starting. Inside the
+      # compose network the api still reaches it on the standard 5432.
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # api must not start migrating before the server accepts connections.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-clauseguard} -d ${POSTGRES_DB:-clauseguard}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-clauseguard}:${POSTGRES_PASSWORD:-clauseguard}@db:5432/${POSTGRES_DB:-clauseguard}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SECRET_KEY: ${SECRET_KEY:-dev-only-insecure-change-me}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Live reload during development.
+      - ./backend/app:/app/app
+      - contracts:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  web:
+    build:
+      context: ./frontend
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  contracts:
