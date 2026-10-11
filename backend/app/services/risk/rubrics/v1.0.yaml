@@ -1,0 +1,480 @@
+version: "1.0"
+notes: >
+  Initial ClauseGuard fairness rubric. Criteria are drawn from standard
+  commercial-contract fairness norms and, where noted, from Indian statute.
+  Every rule states the criterion it tests so a flag can be audited against the
+  rubric version that produced it (SRS 5.5).
+
+  Explanations are written for a business owner with no legal training
+  (SRS 2.3, 5.4 Usability). They describe the commercial consequence and
+  suggest what to ask for, and they never assert that a clause is unlawful or
+  unenforceable — that is a judgement only a lawyer can make (SRS 2.5).
+
+rules:
+  # ======================================================================
+  # Liability and indemnity
+  # ======================================================================
+  - id: uncapped_liability
+    applies_to: [limitation_of_liability, indemnity]
+    severity: high
+    criterion: >
+      Absence of any monetary ceiling on liability exposure in a clause that
+      allocates liability.
+    detect:
+      absent_any:
+        - shall not exceed
+        - not exceed
+        - limited to
+        - aggregate liability
+        - maximum liability
+        - capped at
+        - subject to a cap
+        - total liability
+    explanation: >
+      This clause makes you responsible for losses without setting any upper
+      limit. If something goes wrong, what you owe could be far more than the
+      contract is worth to you. It is normal and reasonable to ask for a cap —
+      commonly the total fees paid over the previous twelve months.
+
+  - id: one_sided_indemnity
+    applies_to: [indemnity]
+    severity: high
+    criterion: >
+      Indemnity obligations running in one direction only, with no reciprocal
+      undertaking from the other party.
+    detect:
+      one_sided_obligation: true
+    explanation: >
+      Only one side has to cover the other's losses here, and it is not
+      mutual. That means you may carry the cost of problems that were not your
+      fault. Ask for the same protection in return — this is usually described
+      as making the indemnity "mutual" or "reciprocal".
+
+  - id: indemnity_covers_indirect_losses
+    applies_to: [indemnity, limitation_of_liability]
+    severity: caution
+    criterion: >
+      Indemnity extended to indirect, consequential or special damages, which
+      are open-ended by nature.
+    detect:
+      present_any:
+        - consequential
+        - indirect losses
+        - indirect damages
+        - loss of profit
+        - loss of profits
+        - loss of business
+        - special damages
+    explanation: >
+      This clause covers not just direct costs but knock-on losses such as lost
+      profits or lost business. Those amounts are hard to predict and can be
+      very large. Most balanced contracts exclude them for both sides.
+
+  # ======================================================================
+  # Termination and renewal
+  # ======================================================================
+  - id: unilateral_termination_for_convenience
+    applies_to: [termination_convenience]
+    severity: high
+    criterion: >
+      A right to terminate without cause granted to one party only.
+    detect:
+      one_sided_right: true
+    explanation: >
+      One side can walk away from this contract at any time, without giving a
+      reason, and the same right is not given to the other. If that side is
+      not you, your work or supply could stop with little warning. Ask for the
+      right to be mutual, or for a minimum notice period.
+
+  - id: termination_without_notice_period
+    applies_to: [termination_convenience]
+    severity: high
+    criterion: >
+      Termination for convenience with no stated notice period.
+    detect:
+      notice_period_absent: true
+    explanation: >
+      This clause allows the contract to be ended without saying how much
+      notice must be given. You could lose the work with no time to plan. Ask
+      for a clear notice period — 30 to 90 days is common.
+
+  - id: no_cure_period
+    applies_to: [termination_cause_cure]
+    severity: caution
+    criterion: >
+      Termination for breach with no opportunity to remedy the breach before
+      termination takes effect.
+    detect:
+      absent_any:
+        - cure
+        - cure period
+        - remedy
+        - rectify
+        - rectification
+        - opportunity to correct
+        - fails to remedy
+    explanation: >
+      This clause lets the contract be ended for a breach without giving you a
+      chance to put the problem right first. A small or accidental slip could
+      cost you the whole contract. Ask for a "cure period" — typically 15 to
+      30 days to fix the issue after being told about it.
+
+  - id: auto_renew_without_notice_window
+    applies_to: [renewal_auto_renewal]
+    severity: high
+    criterion: >
+      Automatic renewal with no specified window in which a party may opt out.
+    detect:
+      present_any:
+        - automatically renew
+        - automatically be renewed
+        - auto-renew
+        - shall renew
+        - deemed renewed
+        - successive periods
+      notice_period_absent: true
+    explanation: >
+      This contract renews itself automatically, and it does not say how much
+      notice you must give to stop that happening. You could be committed to
+      another full term without intending to be. Ask for a clear opt-out
+      window, and put a reminder in your calendar before it closes.
+
+  - id: long_renewal_optout_window
+    applies_to: [renewal_auto_renewal]
+    severity: caution
+    criterion: >
+      Opt-out notice window for auto-renewal exceeding 90 days, which in
+      practice makes the renewal difficult to avoid.
+    detect:
+      present_any:
+        - automatically renew
+        - auto-renew
+        - renewal term
+        - successive periods
+      notice_period_gt: 90
+    explanation: >
+      To stop this contract renewing, you have to give notice a long way in
+      advance — more than three months. It is easy to miss a deadline that far
+      ahead. Note the date now, and consider asking for a shorter window.
+
+  # ======================================================================
+  # Payment — includes Indian statutory norms (SRS 6)
+  # ======================================================================
+  - id: payment_term_over_45_days
+    applies_to: [payment_terms, late_payment_interest_gst]
+    severity: caution
+    criterion: >
+      MSMED Act, 2006, section 15 — a buyer must pay a registered micro or
+      small enterprise within 45 days of acceptance of goods or services.
+    detect:
+      numeric_days_gt: 45
+    explanation: >
+      Payment here is due more than 45 days after invoice. If your business is
+      a registered micro or small enterprise under the MSMED Act, 2006, you are
+      entitled to be paid within 45 days, and a longer period written into a
+      contract does not remove that right. You can raise a delayed-payment
+      claim through the MSME Samadhaan process.
+
+  - id: no_late_payment_interest
+    applies_to: [payment_terms]
+    severity: caution
+    criterion: >
+      Payment terms with no stated consequence for late payment, leaving the
+      supplier without a contractual remedy for delay.
+    detect:
+      absent_any:
+        - interest
+        - late payment
+        - delayed payment
+        - overdue
+        - penalty
+        - default in payment
+    explanation: >
+      This clause says when you should be paid but not what happens if payment
+      is late. Without that, there is little pressure to pay on time. Ask for
+      interest on overdue amounts — and note that the MSMED Act, 2006 provides
+      for compound interest on late payments to registered micro and small
+      enterprises regardless of what the contract says.
+
+  - id: unilateral_price_variation
+    applies_to: [payment_terms]
+    severity: high
+    criterion: >
+      A right for one party to change prices or charges without the other's
+      agreement.
+    detect:
+      present_any:
+        - may revise the price
+        - may change the price
+        - reserves the right to revise
+        - reserves the right to change
+        - at its sole discretion vary
+        - unilaterally revise
+        - prices may be amended
+    explanation: >
+      One side can change the prices in this contract on their own, without
+      needing your agreement. Your costs or your margin could move without
+      warning. Ask for price changes to need both parties' consent, or to be
+      capped and limited to once a year.
+
+  # ======================================================================
+  # Confidentiality and IP
+  # ======================================================================
+  - id: perpetual_confidentiality
+    applies_to: [confidentiality]
+    severity: caution
+    criterion: >
+      Confidentiality obligations with unlimited duration, which are difficult
+      to comply with and to evidence over time.
+    detect:
+      unbounded_duration: true
+    explanation: >
+      This confidentiality duty never ends. That is a long time to keep
+      controlling who in your business has seen what, and it can be hard to
+      prove you complied years later. Three to five years after the contract
+      ends is a common and more workable period, with indefinite protection
+      kept only for genuine trade secrets.
+
+  - id: broad_ip_assignment
+    applies_to: [ip_ownership_licence]
+    severity: high
+    criterion: >
+      Assignment of intellectual property extending beyond work produced under
+      the contract, capturing pre-existing or unrelated IP.
+    detect:
+      present_any:
+        - all intellectual property
+        - any and all intellectual property
+        - all right, title and interest
+        - assigns all
+        - hereby assigns
+        - shall vest solely
+      absent_any:
+        - pre-existing
+        - background ip
+        - background intellectual property
+        - excluding
+        - other than
+    explanation: >
+      This clause hands over intellectual property very broadly, and it does
+      not carve out what you already owned before this contract. Tools,
+      templates or code you built earlier could end up belonging to the other
+      side. Ask for your "pre-existing" or "background" IP to be excluded, and
+      for the assignment to cover only what is made specifically for this work.
+
+  # ======================================================================
+  # Restrictions
+  # ======================================================================
+  - id: exclusivity_without_commitment
+    applies_to: [exclusivity_noncompete]
+    severity: high
+    criterion: >
+      An exclusivity obligation not matched by any minimum volume, value or
+      purchase commitment from the benefiting party.
+    detect:
+      present_any:
+        - exclusive
+        - exclusivity
+        - sole supplier
+        - shall not supply to
+      absent_any:
+        - minimum
+        - guaranteed
+        - commits to purchase
+        - minimum commitment
+        - minimum quantity
+        - minimum order
+    explanation: >
+      You are being asked to deal only with this party, but they are not
+      promising you any minimum amount of business in return. You would be
+      turning away other customers for no guaranteed benefit. Ask for a
+      minimum order commitment alongside the exclusivity, or for the
+      exclusivity to be dropped.
+
+  - id: post_term_noncompete
+    applies_to: [exclusivity_noncompete]
+    severity: caution
+    criterion: >
+      A restraint on trade continuing after the contract ends. Section 27 of
+      the Indian Contract Act, 1872 treats agreements in restraint of trade as
+      void subject to limited exceptions, so enforceability is uncertain.
+    detect:
+      present_any:
+        - after the termination
+        - after termination
+        - following the expiry
+        - post-termination
+        - for a period of
+      present_all:
+        - compete
+    explanation: >
+      This clause tries to stop you competing or approaching certain customers
+      even after the contract has ended. Restrictions like this are treated
+      cautiously under Indian law — section 27 of the Indian Contract Act, 1872
+      makes agreements in restraint of trade void, with limited exceptions — so
+      whether it could actually be enforced is genuinely unclear. If this
+      limits how you earn a living after the contract, it is worth a lawyer's
+      view.
+
+  - id: one_sided_assignment_restriction
+    applies_to: [assignment_control]
+    severity: caution
+    criterion: >
+      A restriction on assignment binding one party only, leaving the other
+      free to transfer the contract.
+    detect:
+      one_sided_obligation: true
+    explanation: >
+      You cannot transfer this contract to anyone else, but the restriction
+      does not appear to apply equally to the other side. They could hand the
+      contract to a different company — possibly one you would not have chosen
+      to work with. Ask for the restriction to apply both ways.
+
+  # ======================================================================
+  # Forum and process
+  # ======================================================================
+  - id: foreign_governing_law
+    applies_to: [governing_law]
+    severity: caution
+    criterion: >
+      Governing law or jurisdiction outside India, materially raising the cost
+      of enforcement for an Indian business.
+    detect:
+      foreign_jurisdiction: true
+    explanation: >
+      Any dispute under this contract would be handled under another country's
+      law, or in another country's courts. Pursuing or defending a claim
+      abroad is far more expensive and slower than doing so in India — often
+      enough to make a genuine claim not worth bringing. Ask for Indian law
+      and an Indian city as the venue.
+
+  - id: foreign_arbitration_seat
+    applies_to: [dispute_arbitration]
+    severity: caution
+    criterion: >
+      Arbitration seated outside India, which makes the process a foreign-
+      seated arbitration with correspondingly higher cost.
+    detect:
+      foreign_jurisdiction: true
+    explanation: >
+      Arbitration under this clause would take place outside India. Travel,
+      foreign lawyers and overseas arbitrator fees make that very costly for a
+      smaller business. Ask for the seat of arbitration to be an Indian city —
+      arbitration in India is governed by the Arbitration and Conciliation Act,
+      1996.
+
+  - id: no_dispute_resolution_mechanism
+    applies_to: [governing_law]
+    severity: caution
+    criterion: >
+      A governing-law clause with no accompanying dispute-resolution process.
+    detect:
+      absent_any:
+        - arbitration
+        - mediation
+        - conciliation
+        - dispute
+        - courts
+        - tribunal
+        - jurisdiction
+    explanation: >
+      This clause says which law applies but not how a disagreement would
+      actually be sorted out. Without an agreed process, your only route is
+      court, which is slow and expensive. Ask for a short escalation process
+      followed by arbitration in an Indian city.
+
+  # ======================================================================
+  # Oversight
+  # ======================================================================
+  - id: unlimited_audit_rights
+    applies_to: [audit_compliance]
+    severity: caution
+    criterion: >
+      Audit or inspection rights with no limit on notice, frequency or scope.
+    detect:
+      present_any:
+        - at any time
+        - without notice
+        - unrestricted access
+        - from time to time
+      absent_any:
+        - reasonable notice
+        - prior written notice
+        - during business hours
+        - once a year
+        - once per year
+    explanation: >
+      The other side can inspect your records or premises at any time, without
+      having to give notice or limit how often. That is disruptive to run a
+      business around. Ask for reasonable prior notice, during working hours,
+      and no more than once or twice a year.
+
+  - id: liquidated_damages_one_way
+    applies_to: [payment_terms, termination_cause_cure, warranties]
+    severity: caution
+    criterion: >
+      Pre-agreed penalties or liquidated damages payable by one party only.
+    detect:
+      present_any:
+        - liquidated damages
+        - penalty of
+        - shall pay a penalty
+        - price reduction for delay
+      one_sided_obligation: true
+    explanation: >
+      This clause sets a fixed penalty that only one side pays if things go
+      wrong. If the other side causes a delay, there is no equivalent
+      consequence for them. Ask for the penalty to work both ways, or for it to
+      be capped as a percentage of the contract value.
+
+# ----------------------------------------------------------------------
+# Contract-level checks: the absence of an entire clause type. These are
+# reported in the contract summary rather than against a single clause,
+# because there is no clause to attach them to.
+# ----------------------------------------------------------------------
+contract_rules:
+  - id: no_force_majeure_clause
+    missing_clause_type: force_majeure
+    severity: caution
+    criterion: >
+      No force majeure provision anywhere in the contract, leaving performance
+      obligations absolute.
+    explanation: >
+      This contract does not appear to deal with events outside either side's
+      control — natural disasters, strikes, government restrictions. Without
+      such a clause you could still be held to your obligations when something
+      genuinely prevents you performing. Ask for a force majeure clause.
+
+  - id: no_limitation_of_liability_clause
+    missing_clause_type: limitation_of_liability
+    severity: high
+    criterion: >
+      No limitation-of-liability provision anywhere in the contract, leaving
+      exposure unbounded by default.
+    explanation: >
+      This contract does not appear to limit how much either side can be made
+      to pay if things go wrong. That leaves your exposure open-ended. Ask for
+      a liability cap — commonly the total fees paid in the previous twelve
+      months.
+
+  - id: no_confidentiality_clause
+    missing_clause_type: confidentiality
+    severity: caution
+    criterion: >
+      No confidentiality provision, leaving commercially sensitive information
+      shared under the contract unprotected.
+    explanation: >
+      This contract does not appear to protect confidential information. Prices,
+      customer lists or methods you share during the work could be passed on.
+      Ask for a confidentiality clause covering both sides.
+
+  - id: no_payment_terms_clause
+    missing_clause_type: payment_terms
+    severity: high
+    criterion: >
+      No identifiable payment-terms provision, leaving the timing and basis of
+      payment undefined.
+    explanation: >
+      We could not find a clause setting out when and how you get paid. That is
+      unusual and important. Make sure payment timing, invoicing and the amount
+      are written down before you sign.
