@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+.env.local
+
+# Uploaded contracts — may contain commercially sensitive data (SRS 5.3).
+# Pattern is `storage/*` and not `storage/`: git does not descend into an
+# excluded directory, so a negation inside one would never be applied and the
+# .gitkeep would go untracked.
+backend/storage/*
+!backend/storage/.gitkeep
+
+# ML artefacts and datasets
+ml/data/raw/
+ml/data/processed/
+ml/artifacts/
+*.onnx
+*.safetensors
+*.bin
+*.pt
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local tooling binary that shipped in this folder
+claude.exe
+CLAUDE.md
+
+# Trained model artefacts (large; produced by ml/scripts/train.py)
+ml/artifacts/
+models/
+
+# TLS material — never commit private keys
+certs/
+certbot-webroot/
+*.pem
+*.key
