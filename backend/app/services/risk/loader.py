@@ -153,7 +153,7 @@ def load_rubric(version: str | None = None) -> Rubric:
         available = sorted(p.stem for p in RUBRIC_DIR.glob("v*.yaml"))
         raise RubricError(f"no rubric for version {version!r}; available: {available}")
 
-    raw_bytes = path.read_bytes()
+    raw_bytes = path.read_bytes().replace(b"\r\n", b"\n")
     sha256 = hashlib.sha256(raw_bytes).hexdigest()
 
     try:

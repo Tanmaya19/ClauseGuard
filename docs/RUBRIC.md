@@ -4,7 +4,7 @@
 > Produced from `backend/app/services/risk/rubrics/v1.0.yaml` by
 > `backend/scripts/generate_rubric_docs.py`. Edit the YAML and re-run it.
 
-**Version 1.0** · SHA-256 `52afdca0ec5ccde12c995f1d05e477a59210abe1687447551fcb2c36c5563ac2`
+**Version 1.0** · SHA-256 `5b4292417aa815f7a83522a0d685eefbc90f21895b564b5cece49868b0228c0e`
 
 Every risk flag ClauseGuard raises comes from one of the rules below.
 There is no model score anywhere in risk assessment: a clause is flagged

@@ -157,7 +157,9 @@ jobs:
           for clause in flagged:
               for finding in clause["findings"]:
                   assert finding["explanation"], "REQ-4.3: flag without an explanation"
-          print(f"{len(report[\"clauses\"])} clauses, {len(flagged)} flagged")
+          n_clauses = len(report["clauses"])
+          n_flagged = len(flagged)
+          print(f"{n_clauses} clauses, {n_flagged} flagged")
           '
 
           curl -sf "$BASE/reports/$CID/pdf" -H "Authorization: Bearer $TOKEN" -o /tmp/report.pdf
