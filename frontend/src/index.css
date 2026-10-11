@@ -34,3 +34,15 @@
     @apply mb-1 block text-sm font-medium text-slate-700;
   }
 }
+
+/* Error shake — triggered by adding the class, removed after animation */
+@keyframes cg-shake {
+  0%, 100% { transform: translateX(0); }
+  18%       { transform: translateX(-7px); }
+  36%       { transform: translateX(7px); }
+  54%       { transform: translateX(-4px); }
+  72%       { transform: translateX(4px); }
+}
+.cg-shake {
+  animation: cg-shake 0.38s cubic-bezier(.36,.07,.19,.97) both;
+}

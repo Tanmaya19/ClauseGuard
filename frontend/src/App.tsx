@@ -5,6 +5,7 @@ import Disclaimer from "./components/Disclaimer";
 import Nav from "./components/Nav";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
 import Processing from "./pages/Processing";
 import ReportView from "./pages/Report";
 import Upload from "./pages/Upload";
@@ -50,10 +51,18 @@ export default function App() {
     );
   }
 
+  // ── Unauthenticated: landing page + login page ──────────────────────────
   if (!email) {
-    return <Auth onAuthenticated={onAuthenticated} />;
+    return (
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Auth onAuthenticated={onAuthenticated} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
   }
 
+  // ── Authenticated: full app ─────────────────────────────────────────────
   return (
     <div className="min-h-screen">
       <Nav email={email} onSignOut={signOut} />
